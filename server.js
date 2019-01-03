@@ -18,8 +18,8 @@ app.route("/request/:word")
 			uri:url,
 			headers:{
 				'User-Agent':'Request-Promise',
-				'app_id':process.env.KEY,
-				'app_key':process.env.ID,
+				'app_id':process.env.ID,
+				'app_key':process.env.KEY,
 			},
 			json:true
 		}
