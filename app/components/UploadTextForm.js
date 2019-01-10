@@ -4,7 +4,7 @@ import Copy from './Copy.js';
 class UploadTextForm extends React.Component {
 	render(){
 		return (
-			<form onSubmit={(e)=>this.props.handleSubmit(e)} className="col-6 offset-md-3 shadow-sm">
+			<form onSubmit={(e)=>this.props.handleSubmit(e)} className="offset-md-3 col-s-12 col-md-6 shadow-sm">
 				<div className='form-group'>
 					<label htmlFor='uploadText'>Paste some text below:</label>
 					<textarea 
@@ -22,10 +22,17 @@ class UploadTextForm extends React.Component {
 						show={this.props.showCopyButton} 
 						handleClick={this.props.handleCopyButtonClick}
 						handleRadio={this.props.handleRadio}
-						disabled={this.props.width?'dummy':'disabled'}
+						disabled={this.props.width?'':'disabled'}
 						width={this.props.width}
 						copyUnit={this.props.copyUnit}
-						handleWidthSelectChange={this.props.handleWidthSelectChange}/>
+						handleWidthSelectChange={this.props.handleWidthSelectChange}
+						copied={this.props.copied}
+						copyMessage={function(bool){
+							console.log('copied',bool)
+							if (bool){
+								return <p className="form-text text-success">Copied to clipboard!</p>
+							}
+						}}/>
 			
 			</form>
 		)

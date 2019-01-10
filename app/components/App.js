@@ -15,7 +15,7 @@ const easyExcludes=['--','I','i','a','an','the','in','inside','are','is','he','s
 'into','was','which','while','from','given','how','its','say','says','added','just','do','that','whether','could','we','out','we','his','she',
 'her','hers','it','ours','anyone','such','be','only','other','our','other','if','would','this','any','all','per','off','on','much','got','did',
 'so','lot','because','those','there','these','going','my','very','us','_','thing','up','didnt','still','ever','might','most','then',
-'went','where','one','him','against','another','being']
+'went','where','one','him','against','another','being','heres','told']
 
 const cloudStyle={transform:"translate(0,0)",float:'left',margin:'0 5px'}
 
@@ -63,6 +63,7 @@ class App extends React.Component {
 		this.state={
 			textInput:"",
 			cloudComponents:[],
+			copied:false,
 			exportWidth:undefined,
 			copyUnit:'%'
 		}
@@ -145,7 +146,8 @@ class App extends React.Component {
 	handleRadio(e){
 		console.log('name',e.currentTarget.name)
 		this.setState({
-			exportWidth:e.currentTarget.name
+			exportWidth:e.currentTarget.name,
+			copied:false
 		})
 	}
 
@@ -173,6 +175,11 @@ class App extends React.Component {
 		textArea.select()
 		document.execCommand('copy')
 		document.body.removeChild(textArea)
+		this.setState({
+			copied:true,
+			exportWidth:undefined,
+			copyUnit:'%'
+		})
 	}
 
 	generateCloud(arr){
@@ -206,11 +213,12 @@ class App extends React.Component {
 					 width={this.state.exportWidth}
 					 handleRadio={this.handleRadio}
 					 copyUnit={this.state.copyUnit}
-					 handleWidthSelectChange={this.handleWidthSelectChange}/>
+					 handleWidthSelectChange={this.handleWidthSelectChange}
+					 copied={this.state.copied}/>
 				</div>
-				<div className='row'>
+				<div className="row">
 					<div 
-					className='cloudContainer col-6 offset-md-3  clearfix'
+					className='cloudContainer col-md-6 col-s-12 offset-md-3 clearfix'
 					style={{minHeight:'300px'}}>
 						<Words 
 						words={this.state.cloudComponents} 
