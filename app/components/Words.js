@@ -6,12 +6,13 @@ class Words extends React.Component{
 		return (
 			<Trail
 				items={this.props.words}
-				from={{transform:'translate(0,500px)',opacity:0}}
-				to={{transform:"translate(0,0)",opacity:1}}>
+				from={{transform:'translate(0,500px)'}}
+				to={this.props.style}>
 				{item=>props=>(
-					<div style={props} className={'wordContainer  mx-1 float-left'}>
+					<div style={props} className={'wordContainer'}>
 						<span style={{fontSize:(this.props.fontSizeMult*item[1])+'em'}} >{item[0]}</span>
-					</div>)
+					</div>
+					)
 				}
 			</Trail>
 		)

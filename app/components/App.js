@@ -1,5 +1,4 @@
 //include possessive forms of nouns (" 's ")
-//turn threshold and font-size multiplier into functions that scale with size of text
 //make shape of cloud more interesting?
 //recognize patterns, like if two words always appear together
 //export cloud
@@ -9,17 +8,16 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import UploadTextForm from './UploadTextForm'
 import { Trail } from 'react-spring'
 import Words from './Words.js'
-console.log(Trail)
 
-
-
-const easyExcludes=['I','i','a','an','the','in','inside','are','is','he','she','you','your','they','their',
+const easyExcludes=['--','I','i','a','an','the','in','inside','are','is','he','she','you','your','they','their',
 'them','get','some','to','as','seems','two','too','of','or','more','me','like','with','have',"he's",'and','has','hes','at','but','by',
 'about','at','back','before','were','what','when','who','on','something','said','mr','for','not','even','can','been','had','really',
 'into','was','which','while','from','given','how','its','say','says','added','just','do','that','whether','could','we','out','we','his','she',
 'her','hers','it','ours','anyone','such','be','only','other','our','other','if','would','this','any','all','per','off','on','much','got','did',
 'so','lot','because','those','there','these','going','my','very','us','_','thing','up','didnt','still','ever','might','most','then',
-'went','where']
+'went','where','one','him','against','another','being']
+
+const cloudStyle={transform:"translate(0,0)",float:'left',margin:'0 5px'}
 
 function filterOutPunctuationAndMinorWords (text) {
 	//let regex=/\.|\?|"|,|'|\*|’|-|“/
@@ -32,7 +30,6 @@ function filterOutPunctuationAndMinorWords (text) {
 		let words=lowercased.join('').split(' ')
 		words=words.filter(word=>easyExcludes.indexOf(word)===-1)
 		words=words.sort();
-		console.log('words length',words.length)
 		return words
 }
 
@@ -53,16 +50,27 @@ function findDuplicates(arr){
 		return duplicates
 }
 
+function fontSizer (words) {
+	const max=Math.max(...words.map(e=>e[1]))
+	let fM= max>20?.2:max>15?.3:max>10?.4:.5
+	return fM
+}
+
 
 class App extends React.Component {
 	constructor(props){
 		super(props);
 		this.state={
 			textInput:"",
-			cloudComponents:[]
+			cloudComponents:[],
+			exportWidth:undefined,
+			copyUnit:'%'
 		}
 		this.handleChange=this.handleChange.bind(this)
 		this.handleSubmit=this.handleSubmit.bind(this)
+		this.handleCopyButtonClick=this.handleCopyButtonClick.bind(this);
+		this.handleRadio=this.handleRadio.bind(this)
+		this.handleWidthSelectChange=this.handleWidthSelectChange.bind(this)
 	}
 
 
@@ -127,8 +135,47 @@ class App extends React.Component {
 		//this.setState({words:arr2})
 	}
 
+	handleWidthSelectChange(e){
+		console.log(e.target.value)
+		this.setState({
+			copyUnit:e.target.value
+		})
+	}
+
+	handleRadio(e){
+		console.log('name',e.currentTarget.name)
+		this.setState({
+			exportWidth:e.currentTarget.name
+		})
+	}
+
+	handleCopyButtonClick(){
+		if (!this.state.exportWidth){
+			return;
+
+		}
+		const words=this.state.cloudComponents
+		const fontSizeMult=fontSizer(words)
+		let textArea=document.createElement('textarea')
+		let str = '<div style="width:'+this.state.exportWidth+this.state.copyUnit+'">',html;
+		let styleStr=''
+		for (let prop in cloudStyle){
+			styleStr+=prop+':'+cloudStyle[prop]+';'
+		}
+		words.forEach(function(e){
+			console.log(e)
+			html='<div style="'+styleStr+'"><span style="font-size:'+(fontSizeMult*e[1]).toFixed(2)+'em">'+e[0]+'</span></div>'
+			str+=html
+		})
+		str+='</div>'
+		textArea.value=str
+		document.body.appendChild(textArea)
+		textArea.select()
+		document.execCommand('copy')
+		document.body.removeChild(textArea)
+	}
+
 	generateCloud(arr){
-		console.log('generating cloud',arr)
 		let words=this.state.words;
 		this.setState({
 			cloudComponents:arr
@@ -144,8 +191,7 @@ class App extends React.Component {
 
 	render(){
 		//set base font size multiplier so words that are repeated very often are not written too large
-		const max=Math.max(...this.state.cloudComponents.map(e=>e[1]))
-		const fontSizeMult=max>20?.2:max>15?.3:max>10?.4:.5
+		const fontSizeMult=fontSizer(this.state.cloudComponents)
 
 		return (
 			<div className="container-fluid">
@@ -154,13 +200,22 @@ class App extends React.Component {
 					<UploadTextForm 
 					 handleChange={this.handleChange}
 					 inputValue={this.state.textInput}
-					 handleSubmit={this.handleSubmit}/>
+					 handleSubmit={this.handleSubmit}
+					 showCopyButton={this.state.cloudComponents.length>0?true:false}
+					 handleCopyButtonClick={this.handleCopyButtonClick}
+					 width={this.state.exportWidth}
+					 handleRadio={this.handleRadio}
+					 copyUnit={this.state.copyUnit}
+					 handleWidthSelectChange={this.handleWidthSelectChange}/>
 				</div>
 				<div className='row'>
 					<div 
 					className='cloudContainer col-6 offset-md-3  clearfix'
 					style={{minHeight:'300px'}}>
-						<Words words={this.state.cloudComponents} fontSizeMult={fontSizeMult}/>
+						<Words 
+						words={this.state.cloudComponents} 
+						fontSizeMult={fontSizeMult}
+						style={cloudStyle}/>
 					</div>
 				</div>
 			</div>
